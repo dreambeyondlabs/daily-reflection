@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Reflection</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ember:    #E8512A;
+    --gold:     #D4A84B;
+    --deep:     #0D0D0F;
+    --charcoal: #1A1A1F;
+    --slate:    #2C2C35;
+    --smoke:    #6B6B7A;
+    --mist:     #A8A8B5;
+    --cream:    #F0EDE8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--deep);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Ambient background ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 10%, rgba(232,81,42,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(212,168,75,0.09) 0%, transparent 55%),
+      radial-gradient(ellipse 80% 60% at 50% 50%, rgba(13,13,15,0.6) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Page wrapper ── */
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding-top: 56px;
+    padding-bottom: 48px;
+    text-align: center;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .header .eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ember);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--cream);
+    margin-bottom: 12px;
+  }
+
+  .header .date-line {
+    font-size: 13px;
+    color: var(--smoke);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--slate), transparent);
+  }
+  .divider span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ember);
+    flex-shrink: 0;
+    box-shadow: 0 0 12px rgba(232,81,42,0.5);
+  }
+
+  /* ── Question cards ── */
+  .questions {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--charcoal);
+    border: 1px solid var(--slate);
+    border-radius: 16px;
+    padding: 28px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.25s;
+    animation: fadeUp 0.6s ease both;
+    cursor: default;
+  }
+
+  .card:nth-child(1) { animation-delay: 0.3s; }
+  .card:nth-child(2) { animation-delay: 0.42s; }
+  .card:nth-child(3) { animation-delay: 0.54s; }
+  .card:nth-child(4) { animation-delay: 0.66s; }
+  .card:nth-child(5) { animation-delay: 0.78s; }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    border-radius: 16px 0 0 16px;
+    background: var(--accent-color, var(--ember));
+    opacity: 0.7;
+  }
+
+  .card:hover {
+    border-color: var(--accent-color, var(--ember));
+    transform: translateY(-2px);
+  }
+
+  /* per-card accent colors */
+  .card:nth-child(1) { --accent-color: #D4A84B; } /* gold   – gratitude */
+  .card:nth-child(2) { --accent-color: #4CAF82; } /* green  – winning  */
+  .card:nth-child(3) { --accent-color: #7B6FCC; } /* violet – letting go */
+  .card:nth-child(4) { --accent-color: #E8512A; } /* ember  – ideal day */
+  .card:nth-child(5) { --accent-color: #4AA8D4; } /* sky    – closure */
+
+  .card-inner {
+    padding-left: 20px;
+  }
+
+  .card .number {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-color, var(--ember));
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .card .question {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 3.5vw, 1.35rem);
+    font-weight: 400;
+    line-height: 1.4;
+    color: var(--cream);
+    margin-bottom: 18px;
+  }
+
+  .card .answer {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--slate);
+    color: var(--cream);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.7;
+    resize: none;
+    outline: none;
+    padding: 8px 0 10px;
+    min-height: 80px;
+    transition: border-color 0.3s;
+    caret-color: var(--accent-color, var(--ember));
+  }
+
+  .card .answer::placeholder {
+    color: var(--smoke);
+    font-style: italic;
+  }
+
+  .card .answer:focus {
+    border-bottom-color: var(--accent-color, var(--ember));
+  }
+
+  /* ── Intention bar ── */
+  .intention-bar {
+    margin-top: 36px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    animation: fadeUp 0.6s 0.9s ease both;
+  }
+
+  .intention-bar .word {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .intention-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--slate);
+    color: var(--cream);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem;
+    padding: 6px 0 8px;
+    outline: none;
+    transition: border-color 0.3s;
+    caret-color: var(--ember);
+  }
+
+  .intention-bar input::placeholder { color: var(--smoke); }
+  .intention-bar input:focus { border-bottom-color: var(--ember); }
+
+  /* ── CTA ── */
+  .cta-row {
+    margin-top: 40px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s 1s ease both;
+  }
+
+  .btn {
+    padding: 13px 28px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border: none;
+    transition: all 0.25s;
+  }
+
+  .btn-primary {
+    background: var(--ember);
+    color: #fff;
+    flex: 1;
+  }
+  .btn-primary:hover { background: #f0622e; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--slate);
+    color: var(--mist);
+  }
+  .btn-ghost:hover { border-color: var(--mist); color: var(--cream); }
+
+  /* ── Saved toast ── */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: var(--charcoal);
+    border: 1px solid var(--slate);
+    color: var(--cream);
+    padding: 12px 24px;
+    border-radius: 40px;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+  .toast .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #4CAF82;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 22px 20px; }
+    .card-inner { padding-left: 14px; }
+    .header { padding-top: 40px; padding-bottom: 36px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="header">
+    <span class="eyebrow">Morning Reflection</span>
+    <h1>Begin with<br><em style="font-style:italic;color:var(--gold)">intention</em></h1>
+    <p class="date-line" id="dateLine">—</p>
+  </header>
+
+  <div class="divider"><span></span></div>
+
+  <!-- Questions -->
+  <div class="questions">
+
+    <div class="card">
+      <div class="card-inner">
+        <span class="number">One · Gratitude</span>
+        <p class="question">What am I grateful for?</p>
+        <textarea class="answer" placeholder="Name it. Own it. Feel it." rows="3"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-inner">
+        <span class="number">Two · Momentum</span>
+        <p class="question">Where am I winning?</p>
+        <textarea class="answer" placeholder="Evidence of your progress, however small." rows="3"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-inner">
+        <span class="number">Three · Release</span>
+        <p class="question">What must I let go of?</p>
+        <textarea class="answer" placeholder="What no longer serves you today?" rows="3"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-inner">
+        <span class="number">Four · Vision</span>
+        <p class="question">What does my ideal day ahead look like?</p>
+        <textarea class="answer" placeholder="Paint the picture. Make it real." rows="4"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-inner">
+        <span class="number">Five · Closure</span>
+        <p class="question">What needs to be said at the end?</p>
+        <textarea class="answer" placeholder="The thing you'll want to have done today." rows="3"></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Word of the day -->
+  <div class="intention-bar">
+    <span class="word">Today's word</span>
+    <input type="text" placeholder="one word to carry with you…" id="wordInput" maxlength="30">
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-row">
+    <button class="btn btn-primary" onclick="saveReflection()">Save Today's Reflection</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="dot"></span>Reflection saved for today
+</div>
+
+<script>
+  // ── Date line ──
+  const dl = document.getElementById('dateLine');
+  const now = new Date();
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  dl.textContent = now.toLocaleDateString('en-US', opts);
+
+  // ── Storage key ──
+  function todayKey() {
+    return 'reflection_' + now.toISOString().slice(0,10);
+  }
+
+  // ── Auto-load saved data ──
+  function loadSaved() {
+    const saved = JSON.parse(localStorage.getItem(todayKey()) || 'null');
+    if (!saved) return;
+    const areas = document.querySelectorAll('.answer');
+    areas.forEach((a, i) => { if (saved.answers?.[i]) a.value = saved.answers[i]; });
+    const wi = document.getElementById('wordInput');
+    if (saved.word) wi.value = saved.word;
+  }
+  loadSaved();
+
+  // ── Auto-save on input ──
+  document.querySelectorAll('.answer, #wordInput').forEach(el => {
+    el.addEventListener('input', debounce(persist, 800));
+  });
+
+  function persist() {
+    const answers = [...document.querySelectorAll('.answer')].map(a => a.value);
+    const word = document.getElementById('wordInput').value;
+    localStorage.setItem(todayKey(), JSON.stringify({ answers, word, saved: new Date().toISOString() }));
+  }
+
+  // ── Manual save ──
+  function saveReflection() {
+    persist();
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2600);
+  }
+
+  // ── Clear ──
+  function clearAll() {
+    if (!confirm('Clear today\'s reflection?')) return;
+    document.querySelectorAll('.answer').forEach(a => a.value = '');
+    document.getElementById('wordInput').value = '';
+    localStorage.removeItem(todayKey());
+  }
+
+  // ── Debounce ──
+  function debounce(fn, ms) {
+    let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+  }
+</script>
+</body>
+</html>
